@@ -154,6 +154,7 @@ int DecryptWXDB(const char *szFile, const char *szOutput, struct cipher_ctx *ctx
   sqlite3 *db;
   int nKey = 0x20;
   const char* key = "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA";
+  bool decrypted = true;
 
   HINSTANCE hWXDll = LoadLibrary(TEXT("WeChatWin.dll"));
   if (hWXDll == NULL) {
@@ -302,6 +303,7 @@ int DecryptWXDB(const char *szFile, const char *szOutput, struct cipher_ctx *ctx
     rc = (*wx_sqlite3_exec)(db, sql[i], simpleCallback, (void *)data, &zErrMsg);
     if (rc != 0) {
       fprintf(stderr, "[%s] exec failed error: %s\n", sql[i], zErrMsg);
+      decrypted = false;
       // FIXME: here i didn't free the zErrMsg with sqlite3_free();
     } else {
       fprintf(stdout, "[%s] exec successed\n", sql[i]);
@@ -310,5 +312,5 @@ int DecryptWXDB(const char *szFile, const char *szOutput, struct cipher_ctx *ctx
 
   free((void *)sql[0]);
   wx_sqlite3_close(db);
-  return 0;
+  return decrypted;
 }
