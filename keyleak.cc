@@ -229,6 +229,7 @@ struct cipher_ctx *DebugWX(int wxPid, const LPVOID sqlcipher_page_cipher) {
 
             // read_ctx *(codecCtx + 0x54)
             SIZE_T read_ctx_ptr = 0;
+            SIZE_T write_ctx_ptr = 0;
             if (NULL == ReadProcessMemory(wxProcess, (LPCVOID)(codecCtx + 0x54),
                                           (LPVOID)&read_ctx_ptr, sizeof(SIZE_T),
                                           (SIZE_T *)&readBytes)) {
@@ -241,66 +242,8 @@ struct cipher_ctx *DebugWX(int wxPid, const LPVOID sqlcipher_page_cipher) {
             fprintf(stderr, "[+] got read_ctx address: 0x%08lx\n",
                     read_ctx_ptr);
 
-            SIZE_T kdf_salt_addr = 0;
-            SIZE_T hmac_kdf_salt_addr = 0;
-            unsigned char *kdf_salt = new unsigned char[0x14 + 1];
-            unsigned char *hmac_kdf_salt = new unsigned char[0x14 + 1];
-            memset(kdf_salt, 0, 0x14 + 1);
-            memset(hmac_kdf_salt, 0, 0x14 + 1);
-
-            if (NULL == ReadProcessMemory(wxProcess, (LPCVOID)(codecCtx + 0x44),
-                                          (LPVOID)&kdf_salt_addr,
-                                          sizeof(SIZE_T),
-                                          (SIZE_T *)&readBytes)) {
-              fprintf(stderr,
-                      "[-] ReadProcessMemory failed: %lu, read %d bytes\n",
-                      GetLastError(), readBytes);
-              exit(-1);
-            }
-
-            if (NULL == ReadProcessMemory(wxProcess, (LPCVOID)(kdf_salt_addr),
-                                          (LPVOID)kdf_salt, 0x14,
-                                          (SIZE_T *)&readBytes)) {
-              fprintf(stderr,
-                      "[-] ReadProcessMemory failed: %lu, read %d bytes\n",
-                      GetLastError(), readBytes);
-              exit(-1);
-            }
-
-            if (NULL == ReadProcessMemory(wxProcess, (LPCVOID)(codecCtx + 0x48),
-                                          (LPVOID)&hmac_kdf_salt_addr,
-                                          sizeof(SIZE_T),
-                                          (SIZE_T *)&readBytes)) {
-              fprintf(stderr,
-                      "[-] ReadProcessMemory failed: %lu, read %d bytes\n",
-                      GetLastError(), readBytes);
-              exit(-1);
-            }
-
-            if (NULL == ReadProcessMemory(wxProcess, (LPCVOID)(hmac_kdf_salt_addr),
-                                          (LPVOID)hmac_kdf_salt, 0x14,
-                                          (SIZE_T *)&readBytes)) {
-              fprintf(stderr,
-                      "[-] ReadProcessMemory failed: %lu, read %d bytes\n",
-                      GetLastError(), readBytes);
-              exit(-1);
-            }
-
-            printf("[+] kdf_salt:\n\t");
-            for (int i = 0; i < 0x14; i++) {
-              printf("%02hhx", kdf_salt[i]);
-            }
-            putchar('\n');
-
-            printf("[+] hmac_kdf_salt:\n\t");
-            for (int i = 0; i < 0x14; i++) {
-              printf("%02hhx", hmac_kdf_salt[i]);
-            }
-            putchar('\n');
-
             cipher_ctx *read_ctx =
                 GetCipherCtx(wxProcess, (LPVOID)read_ctx_ptr);
-
             PrintCTX(read_ctx);
 
             // replace 0xCC
