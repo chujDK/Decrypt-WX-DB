@@ -9,16 +9,16 @@ cl .\main.cc .\decrypt.cc .\keyleak.cc -o decrypt.exe
 ### 使用方法：
 
 ```
-.\decrypt.exe [your encrypted db] [output db]
+.\decrypt.exe [your encrypted db path] [output db path]
 ```
 
 ### 示例：
 
 首先启动微信，登录后，执行
 ```
-.\decrypt.exe "C:\Users\<Your Computer User Name>\Documents\WeChat Files\<Your WX id>\Msg\Multi\MSG0.db"
+.\decrypt.exe "C:\Users\<Your Computer User Name>\Documents\WeChat Files\<Your WX id>\Msg\Multi\MSG0.db" <output db path>
 ```
-然后点击一下某个聊天窗口即可解密
+然后点击一下某个聊天窗口即可解密，将解密后的数据库输出到指定的位置
 
 ### 实现方法：
 
